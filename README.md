@@ -32,7 +32,7 @@
 >
 > 3.5. BÀI TOÁN XẾP HẬU
 
-### §4. KỸ THUẬT NHÁNH CẬN
+### [§4. KỸ THUẬT NHÁNH CẬN](/Part1._Enumeration_problem/Lesson4._Branch_and_Bound_technique/README.md)
 
 > 4.1. BÀI TOÁN TỐI ƯU
 >
