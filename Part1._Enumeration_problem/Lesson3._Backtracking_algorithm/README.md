@@ -578,3 +578,125 @@ int main()
     return 0;
 }
 ```
+
+## 3.5. BÀI TOÁN XẾP HẬU
+
+### 3.5.1. Bài toán
+
+Xét bàn cờ tổng quát kích thước nxn. Một quân hậu trên bàn cờ có thể ăn được các quân khác nằm tại các ô cùng hàng, cùng cột hoặc cùng đường chéo. Hãy tìm các xếp n quân hậu trên bàn cờ sao cho không quân nào ăn quân nào.
+
+Ví dụ một cách xếp với n = 8:
+
+![Xếp 8 quân hậu trên bàn cờ 8x8](/Part1._Enumeration_problem/Lesson3._Backtracking_algorithm/H2.png)
+
+### 3.5.2. Phân tích
+
+Rõ ràng n quân hậu sẽ được đặt mỗi con một hàng vì hậu ăn được ngang, ta gọi quân hậu sẽ đặt ở hàng 1 là quân hậu 1, quân hậu ở hàng 2 là quân hậu 2… quân hậu ở hàng n là quân hậu n. Vậy một nghiệm của bài toán sẽ được biết khi ta tìm ra được **vị trí cột của những quân hậu**.
+
+Nếu ta định hướng Đông (Phải), Tây (Trái), Nam (Dưới), Bắc (Trên) thì ta nhận thấy rằng:
+
+- Một đường chéo theo hướng Đông Bắc - Tây Nam (ĐB-TN) bất kỳ sẽ đi qua một số ô, các ô đó có tính chất: Hàng + Cột = C (Const). Với mỗi đường chéo ĐB-TN ta có 1 hằng số C và với một hằng số C: 2 ≤ C ≤ 2n xác định duy nhất 1 đường chéo ĐB-TN vì vậy ta có thể đánh chỉ số cho các đường chéo ĐB- TN từ 2 đến 2n.
+- Một đường chéo theo hướng Đông Nam - Tây Bắc (ĐN-TB) bất kỳ sẽ đi qua một số ô, các ô đó có tính chất: Hàng - Cột = C (Const). Với mỗi đường chéo ĐN-TB ta có 1 hằng số C và với một hằng số C: 1-n ≤ C ≤ n-1 xác định duy nhất 1 đường chéo ĐN-TB vì vậy ta có thể đánh chỉ số cho các đường chéo ĐN- TB từ 1-n đến n-1.
+
+![Đường chéo ĐB-TN mang chỉ số 10 và đường chéo ĐN-TB mang chỉ số 0](/Part1._Enumeration_problem/Lesson3._Backtracking_algorithm/H3.png)
+
+***Cài đặt:***
+
+**Ta có 3 mảng logic để đánh dấu:**
+
+- Mảng a[1..n]. a[i] = TRUE nếu như cột i còn tự do, a[i] = FALSE nếu như cột i đã bị một quân hậu khống chế
+- Mảng b[2..2n]. b[i] = TRUE nếu như đường chéo ĐB-TN thứ i còn tự do, b[i] = FALSE nếu như đường chéo đó đã bị một quân hậu khống chế.
+- Mảng c[1-n..n-1]. c[i] = TRUE nếu như đường chéo ĐN-TB thứ i còn tự do, c[i] = FALSE nếu như đường chéo đó đã bị một quân hậu khống chế.
+
+Ban đầu cả 3 mảng đánh dấu đều mang giá trị TRUE. (Các cột và đường chéo đều tự do)
+
+**Thuật toán quay lui:**
+
+- Xét tất cả các cột, thử đặt quân hậu 1 vào một cột, với mỗi cách đặt như vậy, xét tất cả các cách đặt quân hậu 2 không bị quân hậu 1 ăn, lại thử 1 cách đặt và xét tiếp các cách đặt quân hậu 3…Mỗi cách đặt được đến quân hậu n cho ta 1 nghiệm
+- Khi chọn vị trí cột j cho quân hậu thứ i, thì ta phải chọn ô(i, j) không bị các quân hậu đặt trước đó ăn, tức là phải chọn cột j còn tự do, đường chéo ĐB-TN (i+j) còn tự do, đường chéo ĐN-TB(i-j) còn tự do. Điều này có thể kiểm tra (a[j] = b[i+j] = c[i-j] = TRUE)
+- Khi thử đặt được quân hậu thứ i vào cột j, nếu đó là quân hậu cuối cùng (i = n) thì ta có
+một nghiệm. Nếu không:
+  - Trước khi gọi đệ quy tìm cách đặt quân hậu thứ i + 1, ta đánh dấu cột và 2 đường chéo bị quân hậu vừa đặt khống chế (a[j] = b[i+j] = c[i-j] := FALSE) để các lần gọi đệ quy tiếp sau chọn cách đặt các quân hậu kế tiếp sẽ không chọn vào những ô nằm trên cột j và những đường chéo này nữa.
+  - Sau khi gọi đệ quy tìm cách đặt quân hậu thứ i + 1, có nghĩa là sắp tới ta lại thử một cách đặt khác cho quân hậu thứ i, ta bỏ đánh dấu cột và 2 đường chéo bị quân hậu vừa thử đặt khống chế (a[j] = b[i+j] = c[i-j] := TRUE) tức là cột và 2 đường chéo đó lại thành tự do, bởi khi đã đặt quân hậu i sang vị trí khác rồi thì cột và 2 đường chéo đó hoàn toàn có thể gán cho một quân hậu khác
+
+Hãy xem lại trong các chương trình liệt kê chỉnh hợp không lặp và hoán vị về kỹ thuật đánh dấu. Ở đây chỉ khác với liệt kê hoán vị là: liệt kê hoán vị chỉ cần một mảng đánh dấu xem giá trị có tự do không, còn bài toán xếp hậu thì cần phải đánh dấu cả 3 thành phần: Cột, đường chéo ĐB-TN, đường chéo ĐN- TB. Trường hợp đơn giản hơn: Yêu cầu liệt kê các cách đặt n quân xe lên bàn cờ nxn sao cho không quân nào ăn quân nào chính là bài toán liệt kê hoán vị
+
+***Input:*** file văn bản QUEENS.INP chứa số nguyên dương n ≤ 12
+
+***Output:*** file văn bản QUEENS.OUT, mỗi dòng ghi một cách đặt n quân hậu
+
+| QUEENS.INP | QUEENS.OUT |
+|:----------:|:----------:|
+|     5      | (1, 1); (2, 3); (3, 5); (4, 2); (5, 4); |
+|            | (1, 1); (2, 4); (3, 2); (4, 5); (5, 3); |
+|            | (1, 2); (2, 4); (3, 1); (4, 3); (5, 5); |
+|            | (1, 2); (2, 5); (3, 3); (4, 1); (5, 4); |
+|            | (1, 3); (2, 1); (3, 4); (4, 2); (5, 5); |
+|            | (1, 3); (2, 5); (3, 2); (4, 4); (5, 1); |
+|            | (1, 4); (2, 1); (3, 3); (4, 5); (5, 2); |
+|            | (1, 4); (2, 2); (3, 5); (4, 3); (5, 1); |
+|            | (1, 5); (2, 2); (3, 4); (4, 1); (5, 3); |
+|            | (1, 5); (2, 3); (3, 1); (4, 4); (5, 2); |
+
+***Code Pascal***
+
+```pascal
+program n_Queens;
+
+const
+    InputFile = 'QUEENS.INP';
+    OutputFile = 'QUEENS.OUT';
+    max = 12;
+var
+    n: Integer;
+    x: array[1..max] of Integer;
+    a: array[1..max] of Boolean;
+    b: array[2..2 * max] of Boolean;
+    c: array[1 - max..max - 1] of Boolean;
+    f: Text;
+
+procedure Init;
+begin
+    Assign(f, InputFile); Reset(f);
+    ReadLn(f, n);
+    Close(f);
+    FillChar(a, SizeOf(a), True); {Mọi cột đều tự do}
+    FillChar(b, SizeOf(b), True); {Mọi đường chéo Đông Bắc - Tây Nam đều tự do}
+    FillChar(c, SizeOf(c), True); {Mọi đường chéo Đông Nam - Tây Bắc đều tự do}
+end;
+
+procedure PrintResult;
+var
+    i: Integer;
+begin
+    for i := 1 to n do Write(f, '(', i, ', ', x[i], '); ');
+    WriteLn(f);
+end;
+
+procedure Try(i: Integer); {Thử các cách đặt quân hậu thứ i vào hàng i}
+var
+    j: Integer;
+begin
+    for j := 1 to n do
+    if a[j] and b[i + j] and c[i - j] then {Chỉ xét những cột j mà ô (i, j) chưa bị khống chế}
+        begin
+            x[i] := j; {Thử đặt quân hậu i vào cột j}
+            if i = n then PrintResult
+            else
+                begin
+                    a[j] := False; b[i + j] := False; c[i - j] := False; {Đánh dấu}
+                    Try(i + 1); {Tìm các cách đặt quân hậu thứ i + 1}
+                    a[j] := True; b[i + j] := True; c[i - j] := True; {Bỏ đánh dấu}
+                end;
+        end;
+end;
+
+begin
+    Init;
+    Assign(f, OutputFile); Rewrite(f);
+    Try(1);
+    Close(f);
+end.
+```
+
+Tên gọi thuật toán quay lui, đứng trên phương diện cài đặt có thể nên gọi là kỹ thuật vét cạn bằng quay lui thì chính xác hơn, tuy nhiên đứng trên phương diện bài toán, nếu như ta coi công việc giải bài toán bằng cách xét tất cả các khả năng cũng là 1 cách giải thì tên gọi Thuật toán quay lui cũng không có gì trái logic. Xét hoạt động của chương trình trên cây tìm kiếm quay lui ta thấy tại bước thử chọn x[i] nó sẽ gọi đệ quy để tìm tiếp x[i+1] có nghĩa là quá trình sẽ duyệt tiến sâu xuống phía dưới đến tận nút lá, sau khi đã duyệt hết các nhánh, tiến trình lùi lại thử áp đặt một giá trị khác cho x[i], đó chính là nguồn gốc của tên gọi "thuật toán quay lui"
