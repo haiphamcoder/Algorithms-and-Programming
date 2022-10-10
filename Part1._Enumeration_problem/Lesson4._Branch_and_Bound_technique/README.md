@@ -132,13 +132,13 @@ begin
                             Free[j] := False; {Đánh dấu thành phố vừa thử}
                             Try(i + 1); {Tìm các khả năng chọn x[i+1]}
                             Free[j] := True; {Bỏ đánh dấu}
-                        end;
-                else
-                    if T[n] + C[x[n], 1] < MinSpending then {Từ x[n] quay lại 1 vẫn tốn chi phí ít hơn trước}
-                        begin {Cập nhật BestConfig}
-                            BestWay := X;
-                            MinSpending := T[n] + C[x[n], 1];
-                        end;
+                        end
+                    else
+                        if T[n] + C[x[n], 1] < MinSpending then {Từ x[n] quay lại 1 vẫn tốn chi phí ít hơn trước}
+                            begin {Cập nhật BestConfig}
+                                BestWay := X;
+                                MinSpending := T[n] + C[x[n], 1];
+                            end;
             end;
 end;
 
